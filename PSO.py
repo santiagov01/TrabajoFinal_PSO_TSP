@@ -121,8 +121,8 @@ class PSO:
         #Recordar establecer ciudad de origen
         random_population = [self.random_route(0) for _ in range(self.population_size - 1)]
         greedy_population = [self.greedy_route(0)]
-        #return [*random_population, *greedy_population]
-        return [*random_population]
+        return [*random_population, *greedy_population]
+        #return [*random_population]
 
     def greedy_route(self, start_index):
         """
@@ -149,28 +149,28 @@ class PSO:
             self.gbest = min(self.particles, key=lambda p: p.pbest_cost)
 
             #Mostrar gráfico en pantalla
-            if t % 20 == 0:
-                plt.figure(0)
-                plt.plot(pso.gcost_iter, 'g')
-                plt.ylabel('Distancia')
-                plt.xlabel('Iteración')
-                fig = plt.figure(0)
-                fig.suptitle(f'Loss Function. Iteration: {t}')
+            # if t % 20 == 0:
+            #     plt.figure(0)
+            #     plt.plot(pso.gcost_iter, 'g')
+            #     plt.ylabel('Distancia')
+            #     plt.xlabel('Iteración')
+            #     fig = plt.figure(0)
+            #     fig.suptitle(f'Loss Function. Iteration: {t}')
+                
+            #     x_list, y_list = [], []
+            #     for city in self.gbest.pbest:
+            #         x_list.append(city.x)
+            #         y_list.append(city.y)
+            #     x_list.append(pso.gbest.pbest[0].x)
+            #     y_list.append(pso.gbest.pbest[0].y)
+            #     fig = plt.figure(1)
+            #     fig.clear()
+            #     fig.suptitle(f'PSO - TSP cities. Iteration {t}')
 
-                x_list, y_list = [], []
-                for city in self.gbest.pbest:
-                    x_list.append(city.x)
-                    y_list.append(city.y)
-                x_list.append(pso.gbest.pbest[0].x)
-                y_list.append(pso.gbest.pbest[0].y)
-                fig = plt.figure(1)
-                fig.clear()
-                fig.suptitle(f'PSO - TSP cities. Iteration {t}')
-
-                plt.plot(y_list, x_list, 'ro')
-                plt.plot(y_list, x_list, 'g')
-                plt.draw()
-                plt.pause(.001)
+            #     plt.plot(y_list, x_list, 'ro')
+            #     plt.plot(y_list, x_list, 'g')
+            #     plt.draw()
+            #     plt.pause(.001)
             self.gcost_iter.append(self.gbest.pbest_cost)
 
             for particle in self.particles:
@@ -214,7 +214,7 @@ class PSO:
                 particle.route = new_route #Actualiza ruta
                 particle.update_costs_and_pbest() #Actualiza costos y mejor ruta de particula
             #Actualizar probabilidad de intercambio
-            self.pbest_probability = self.pbest_probability * 1.000005
+            self.pbest_probability = self.pbest_probability * 1.00001
             self.gbest_probability = self.gbest_probability * 1.00001
 
 import folium
@@ -238,28 +238,58 @@ def plot_map(x_list, y_list,name='map.html'):
     map
 
 if __name__ == "__main__":
-    num_cities = 50 #Establecer cantidad de ciudades
-    file_path = 'data/cities_150.data'  # Archivo de texto con las ciudades
+    # num_cities = 50 #Establecer cantidad de ciudades
+    # file_path = 'data/cities_150.data'  # Archivo de texto con las ciudades
 
-    cities = read_cities(num_cities, file_path) # Lista de objetos City
-    pso = PSO(iterations= 2000, population_size=2000, pbest_probability=0.04, gbest_probability=0.05, cities=cities)
-    pso.run()
-    print(f'cost: {pso.gbest.pbest_cost}\t| gbest: {pso.gbest.pbest}')
+    # cities = read_cities(num_cities, file_path) # Lista de objetos City
+    # pso = PSO(iterations= 2000, population_size=5000, pbest_probability=0.04, gbest_probability=0.02, cities=cities)
+    # pso.run()
+    # print(f'cost: {pso.gbest.pbest_cost}\t| gbest: ⁄n{pso.gbest.pbest}')
 
-    x_list, y_list = [], []
-    for city in pso.gbest.pbest:
-        x_list.append(city.x)
-        y_list.append(city.y)
-    x_list.append(pso.gbest.pbest[0].x)
-    y_list.append(pso.gbest.pbest[0].y)
-    # Save map
-    plot_map(x_list, y_list, 'map.html')
+    # x_list, y_list = [], []
+    # for city in pso.gbest.pbest:
+    #     x_list.append(city.x)
+    #     y_list.append(city.y)
+    # x_list.append(pso.gbest.pbest[0].x)
+    # y_list.append(pso.gbest.pbest[0].y)
+    # # Save map
+    # plot_map(x_list, y_list, 'map.html')
 
-    fig = plt.figure(1)
-    fig.suptitle('PSO for TSP')
+    # fig = plt.figure(1)
+    # fig.suptitle('PSO for TSP')
 
-    plt.plot(y_list, x_list, 'ro')
-    plt.plot(y_list, x_list)
-    plt.show(block=True)
+    # plt.plot(y_list, x_list, 'ro')
+    # plt.plot(y_list, x_list)
+    # plt.show(block=True)
+
+    lista_ciudades = [10, 15, 20, 50, 70, 100, 150]
+    for i in lista_ciudades:
+        file_path = 'data/cities_150.data'  # Archivo de texto con las ciudades
+        cities = read_cities(i, file_path)
+        pso = PSO(iterations= 500, population_size=1000, pbest_probability=0.5, gbest_probability=0.5, cities=cities)
+        pso.run()
+        print(f'cost: {pso.gbest.pbest_cost}\t| gbest: {pso.gbest.pbest}')
+        
+        plt.figure(0)
+        plt.plot(pso.gcost_iter, 'g')
+        plt.ylabel('Distancia')
+        plt.xlabel('Iteración')
+        fig = plt.figure(0)
+        fig.suptitle(f'Loss Function. Cities: {i}')
+        x_list, y_list = [], []
+        for city in pso.gbest.pbest:
+            x_list.append(city.x)
+            y_list.append(city.y)
+        x_list.append(pso.gbest.pbest[0].x)
+        y_list.append(pso.gbest.pbest[0].y)
+        # Save map
+        plot_map(x_list, y_list, f'map_{i}.html')
+
+        fig = plt.figure(1)
+        fig.suptitle('PSO for TSP. Cities: '+str(i))
+
+        plt.plot(y_list, x_list, 'ro')
+        plt.plot(y_list, x_list)
+        plt.show(block=True)
 
     
