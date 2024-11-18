@@ -262,11 +262,11 @@ if __name__ == "__main__":
     # plt.plot(y_list, x_list)
     # plt.show(block=True)
 
-    lista_ciudades = [10, 15, 20, 50, 70, 100, 150]
+    lista_ciudades = [50]
     for i in lista_ciudades:
         file_path = 'data/cities_150.data'  # Archivo de texto con las ciudades
         cities = read_cities(i, file_path)
-        pso = PSO(iterations= 500, population_size=1000, pbest_probability=0.5, gbest_probability=0.5, cities=cities)
+        pso = PSO(iterations= 1000, population_size=1000, pbest_probability=0.08, gbest_probability=0.05, cities=cities)
         pso.run()
         print(f'cost: {pso.gbest.pbest_cost}\t| gbest: {pso.gbest.pbest}')
         
