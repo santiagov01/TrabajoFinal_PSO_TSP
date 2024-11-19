@@ -227,7 +227,7 @@ if __name__ == "__main__":
     for i in lista_ciudades:
         file_path = 'data/cities_150.data'  # Archivo de texto con las ciudades
         cities = read_cities(i, file_path)
-        pso = PSO(iterations= 1000, population_size=1000, pbest_probability=0.08, gbest_probability=0.05, cities=cities)
+        pso = PSO(iterations= 2500, population_size=1000, pbest_probability=0.08, gbest_probability=0.6, cities=cities)
         pso.run()
         #print(f'cost: {pso.gbest.pbest_cost}\t| gbest: {pso.gbest.pbest}')
         
