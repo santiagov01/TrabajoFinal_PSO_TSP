@@ -4,6 +4,13 @@ import matplotlib.pyplot as plt
 
 
 class City:
+    """
+    Clase para definir una ciudad en el problema del TSP
+
+    Cada ciudad tiene una coordenada (x, y) correspondientes a latitud y longitud
+    Se puede cononcer la distancia con otra ciudad  
+
+    """
     def __init__(self, x, y):
         # Coordenadas de cada ciudad
         self.x = x
@@ -40,18 +47,6 @@ def read_cities(size, file_path ="data/cities_150.data"):
     return cities
 
 
-'''def write_cities_and_return_them(size):
-    cities = generate_cities(size)
-    with open(f'data/cities_{size}.data', 'w+') as handle:
-        for city in cities:
-            handle.write(f'{city.x} {city.y}\n')
-    return cities
-
-
-def generate_cities(size):
-    return [City(x=int(random.random() * 1000), y=int(random.random() * 1000)) for _ in range(size)]
-'''
-
 def path_cost(route):
     """
     route: lista de ciudades de la ruta
@@ -62,6 +57,11 @@ def path_cost(route):
     return sum([city.distance(route[index - 1]) for index, city in enumerate(route)])
 
 class Particle:
+    """
+    Clase para definir una partícula en el algoritmo PSO
+    Cada partícula tiene una ruta, la mejor solución local y su costo
+    Se puede actualizar la mejor solución local y el costo
+    """
     def __init__(self, route, cost=None):
         self.route = route #Lista de ciudades
         self.pbest = route #Inicializa ruta por defecto para cada particula
@@ -83,6 +83,13 @@ class Particle:
 
 
 class PSO:
+    """
+    Clase para definir el algoritmo PSO.
+
+    Está integrado principalmente por la lista de ciudades, la mejor solución local y global, y las partículas.
+    
+    Se implementa el operador de intercambio (swap) para la actualización de las rutas de las partículas.
+    """
 
     def __init__(self, iterations, population_size, pbest_probability=1.0, gbest_probability=1.0, cities=None):
         self.cities = cities
@@ -97,29 +104,29 @@ class PSO:
         solutions = self.initial_population()
         self.particles = [Particle(route=solution) for solution in solutions]
 
-    # def random_route(self):
+    def random_route(self):
+        """
+        Retorna una ruta aleatoria. 
+        En esta versión no se especifica una ciudad de origen
+        """    
+        return random.sample(self.cities, len(self.cities))
+    # def random_route(self, start_index):
     #     """
-    #     Retorna una ruta aleatoria. 
-    #     En esta versión no se especifica una ciudad de origen
-    #     """    
-    #     return random.sample(self.cities, len(self.cities))
-    def random_route(self, start_index):
-        """
-        Retorna una ruta aleatoria.
-        Ciudad de origen especificada
-        """
-        original = random.sample(self.cities, len(self.cities))
-        for i,cit in enumerate(original):
-            if cit == self.cities[start_index]:
-                #Establece ciudad de origen en primera posición
-                original[start_index], original[i] = original[i], original[start_index]
-                #¿Agregar la ciudad de origen al final de la lista?
-                #original.append(original[start_index])
-                return original
+    #     Retorna una ruta aleatoria.
+    #     Ciudad de origen especificada
+    #     """
+    #     original = random.sample(self.cities, len(self.cities))
+    #     for i,cit in enumerate(original):
+    #         if cit == self.cities[start_index]:
+    #             #Establece ciudad de origen en primera posición
+    #             original[start_index], original[i] = original[i], original[start_index]
+    #             #¿Agregar la ciudad de origen al final de la lista?
+    #             #original.append(original[start_index])
+    #             return original
 
     def initial_population(self):
         #Recordar establecer ciudad de origen
-        random_population = [self.random_route(0) for _ in range(self.population_size - 1)]
+        random_population = [self.random_route() for _ in range(self.population_size - 1)]
         greedy_population = [self.greedy_route(0)]
         return [*random_population, *greedy_population]
         #return [*random_population]
@@ -141,36 +148,13 @@ class PSO:
     def run(self):
         self.gbest = min(self.particles, key=lambda p: p.pbest_cost)
         print(f"initial cost is {self.gbest.pbest_cost}")
-        plt.ion()
-        plt.draw()
+
         prob_c0 = 1 - (self.gbest_probability + self.pbest_probability)
         for t in range(self.iterations):
             #Actualizar la mejor solución global
             self.gbest = min(self.particles, key=lambda p: p.pbest_cost)
 
-            #Mostrar gráfico en pantalla
-            # if t % 20 == 0:
-            #     plt.figure(0)
-            #     plt.plot(pso.gcost_iter, 'g')
-            #     plt.ylabel('Distancia')
-            #     plt.xlabel('Iteración')
-            #     fig = plt.figure(0)
-            #     fig.suptitle(f'Loss Function. Iteration: {t}')
-                
-            #     x_list, y_list = [], []
-            #     for city in self.gbest.pbest:
-            #         x_list.append(city.x)
-            #         y_list.append(city.y)
-            #     x_list.append(pso.gbest.pbest[0].x)
-            #     y_list.append(pso.gbest.pbest[0].y)
-            #     fig = plt.figure(1)
-            #     fig.clear()
-            #     fig.suptitle(f'PSO - TSP cities. Iteration {t}')
 
-            #     plt.plot(y_list, x_list, 'ro')
-            #     plt.plot(y_list, x_list, 'g')
-            #     plt.draw()
-            #     plt.pause(.001)
             self.gcost_iter.append(self.gbest.pbest_cost)
 
             for particle in self.particles:
@@ -238,37 +222,14 @@ def plot_map(x_list, y_list,name='map.html'):
     map
 
 if __name__ == "__main__":
-    # num_cities = 50 #Establecer cantidad de ciudades
-    # file_path = 'data/cities_150.data'  # Archivo de texto con las ciudades
 
-    # cities = read_cities(num_cities, file_path) # Lista de objetos City
-    # pso = PSO(iterations= 2000, population_size=5000, pbest_probability=0.04, gbest_probability=0.02, cities=cities)
-    # pso.run()
-    # print(f'cost: {pso.gbest.pbest_cost}\t| gbest: ⁄n{pso.gbest.pbest}')
-
-    # x_list, y_list = [], []
-    # for city in pso.gbest.pbest:
-    #     x_list.append(city.x)
-    #     y_list.append(city.y)
-    # x_list.append(pso.gbest.pbest[0].x)
-    # y_list.append(pso.gbest.pbest[0].y)
-    # # Save map
-    # plot_map(x_list, y_list, 'map.html')
-
-    # fig = plt.figure(1)
-    # fig.suptitle('PSO for TSP')
-
-    # plt.plot(y_list, x_list, 'ro')
-    # plt.plot(y_list, x_list)
-    # plt.show(block=True)
-
-    lista_ciudades = [50]
+    lista_ciudades = [10,15,20,30, 50,60,100, 150]
     for i in lista_ciudades:
         file_path = 'data/cities_150.data'  # Archivo de texto con las ciudades
         cities = read_cities(i, file_path)
         pso = PSO(iterations= 1000, population_size=1000, pbest_probability=0.08, gbest_probability=0.05, cities=cities)
         pso.run()
-        print(f'cost: {pso.gbest.pbest_cost}\t| gbest: {pso.gbest.pbest}')
+        #print(f'cost: {pso.gbest.pbest_cost}\t| gbest: {pso.gbest.pbest}')
         
         plt.figure(0)
         plt.plot(pso.gcost_iter, 'g')
@@ -276,6 +237,9 @@ if __name__ == "__main__":
         plt.xlabel('Iteración')
         fig = plt.figure(0)
         fig.suptitle(f'Loss Function. Cities: {i}')
+        #Save png image
+        plt.savefig(f'output_map/loss_function_{i}.png')
+
         x_list, y_list = [], []
         for city in pso.gbest.pbest:
             x_list.append(city.x)
@@ -292,4 +256,5 @@ if __name__ == "__main__":
         plt.plot(y_list, x_list)
         plt.show(block=True)
 
+        print(f"Ciudades: {i}. Costo final: {pso.gbest.pbest_cost}")
     
